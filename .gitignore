@@ -9,6 +9,10 @@ dist-ssr/
 # WorkBuddy 项目数据（本地记忆，不进入版本库）
 .workbuddy/
 
+# 本地中文名副本（内容同 analysis.html；本机安全策略会拦截 git 读取该路径，
+# 若需保留本地副本请用此名，仓库内一律使用 ASCII 命名的 analysis.html）
+/项目分析.html
+
 # Editor / OS
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoManual AI 项目分析</title>
+<style>
+  :root {
+    --brand: #1E3A8A;
+    --brand-light: #3B82F6;
+    --brand-bg: #EFF6FF;
+    --green: #16A34A;
+    --green-bg: #F0FDF4;
+    --amber: #D97706;
+    --amber-bg: #FFFBEB;
+    --ink: #1E293B;
+    --ink-2: #475569;
+    --ink-3: #94A3B8;
+    --line: #E2E8F0;
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 28px 80px; }
+
+  /* ===== 头部 ===== */
+  .hero {
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+    border-radius: 16px; color: #fff; padding: 44px 40px; margin-bottom: 20px;
+  }
+  .hero .tag {
+    display: inline-block; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px; padding: 2px 14px; font-size: 12.5px; letter-spacing: .5px; margin-bottom: 14px;
+  }
+  .hero h1 { font-size: 30px; font-weight: 700; letter-spacing: .5px; }
+  .hero .sub { margin-top: 6px; font-size: 15px; opacity: .92; }
+  .hero .meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 13px; opacity: .85; }
+  .hero .meta b { font-weight: 600; opacity: 1; }
+
+  .pitch {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 26px 30px; margin-bottom: 36px;
+  }
+  .pitch h2 { font-size: 13px; color: var(--brand); letter-spacing: 2px; margin-bottom: 14px; }
+  .pitch ol { list-style: none; }
+  .pitch li { padding: 10px 0 10px 42px; position: relative; font-size: 15px; }
+  .pitch li + li { border-top: 1px dashed var(--line); }
+  .pitch li .no {
+    position: absolute; left: 0; top: 12px; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--brand-bg); color: var(--brand); font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pitch strong { color: var(--brand); }
+
+  /* ===== 区块标题 ===== */
+  section { margin-bottom: 44px; }
+  .sec-title { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+  .sec-title .idx {
+    font-size: 13px; font-weight: 800; color: #fff; background: var(--brand);
+    border-radius: 6px; padding: 1px 8px; letter-spacing: 1px;
+  }
+  .sec-title h2 { font-size: 21px; font-weight: 700; }
+  .sec-title .en { font-size: 12px; color: var(--ink-3); letter-spacing: 1px; }
+
+  /* ===== 痛点表格 ===== */
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); font-size: 14px; }
+  th { background: var(--brand); color: #fff; text-align: left; padding: 10px 16px; font-weight: 600; font-size: 13.5px; }
+  td { padding: 11px 16px; border-top: 1px solid var(--line); vertical-align: top; }
+  tr td:first-child { font-weight: 600; white-space: nowrap; }
+  td .old { color: var(--ink-3); }
+  td .new { color: var(--brand); font-weight: 500; }
+
+  /* ===== 工作流 ===== */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex; gap: 18px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 22px; position: relative;
+  }
+  .flow-step + .flow-step { margin-top: 10px; }
+  .flow-step .n {
+    flex: none; width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light)); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700;
+  }
+  .flow-step h3 { font-size: 15.5px; margin-bottom: 3px; }
+  .flow-step h3 span { font-size: 12px; color: var(--ink-3); font-weight: 400; margin-left: 8px; }
+  .flow-step p { font-size: 13.5px; color: var(--ink-2); }
+  .flow-step .hl { color: var(--brand); font-weight: 600; }
+  .flow-banner {
+    margin-top: 12px; background: var(--brand-bg); border: 1px dashed #BFDBFE; color: var(--brand);
+    border-radius: 10px; padding: 12px 18px; font-size: 14px; font-weight: 600; text-align: center;
+  }
+
+  /* ===== 架构 ===== */
+  .arch { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 26px; }
+  .arch-row { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; }
+  .arch-node {
+    flex: 1; min-width: 150px; border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; text-align: center; background: #fff;
+  }
+  .arch-node .t { font-size: 14px; font-weight: 700; }
+  .arch-node .d { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .arch-node.done { border-color: var(--green); background: var(--green-bg); }
+  .arch-node.done .t { color: var(--green); }
+  .arch-node.plan { border-style: dashed; color: var(--ink-3); }
+  .arch-arrow { align-self: center; color: var(--ink-3); font-size: 18px; font-weight: 700; }
+  .arch-cap { text-align: center; font-size: 12px; color: var(--ink-3); margin-top: 12px; }
+  .arch-cap .g { color: var(--green); font-weight: 700; }
+  .arch-cap .a { color: var(--amber); font-weight: 700; }
+
+  /* ===== 数据契约亮点 ===== */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+    border-top: 3px solid var(--brand);
+  }
+  .card h3 { font-size: 15px; color: var(--brand); margin-bottom: 8px; }
+  .card p { font-size: 13px; color: var(--ink-2); }
+  .card code {
+    display: block; margin-top: 10px; background: #0F172A; color: #7DD3FC; border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; font-family: Consolas, "Courier New", monospace;
+    white-space: pre-wrap; line-height: 1.5;
+  }
+  @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+
+  /* ===== 进度条 ===== */
+  .progress { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px 28px; }
+  .prow { display: flex; align-items: center; gap: 16px; padding: 10px 0; }
+  .prow + .prow { border-top: 1px dashed var(--line); }
+  .prow .name { flex: none; width: 210px; font-size: 14px; font-weight: 600; }
+  .prow .bar { flex: 1; height: 12px; background: #EEF2F7; border-radius: 999px; overflow: hidden; }
+  .prow .fill { height: 100%; border-radius: 999px; }
+  .prow .pct { flex: none; width: 108px; text-align: right; font-size: 13px; font-weight: 700; }
+  .fill.f100 { background: var(--green); } .pct.f100 { color: var(--green); }
+  .fill.f40 { background: var(--amber); } .pct.f40 { color: var(--amber); }
+  .fill.f10 { background: #F59E0B; } .pct.f10 { color: #B45309; }
+  .fill.f0 { background: #CBD5E1; } .pct.f0 { color: var(--ink-3); }
+
+  /* ===== 优缺点 ===== */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } }
+  .box { border-radius: 12px; padding: 20px 22px; border: 1px solid var(--line); background: var(--card); }
+  .box.good { border-top: 3px solid var(--green); }
+  .box.risk { border-top: 3px solid var(--amber); }
+  .box h3 { font-size: 15px; margin-bottom: 10px; }
+  .box.good h3 { color: var(--green); }
+  .box.risk h3 { color: var(--amber); }
+  .box ul { list-style: none; }
+  .box li { font-size: 13.5px; color: var(--ink-2); padding: 5px 0 5px 18px; position: relative; }
+  .box.good li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+  .box.risk li::before { content: "!"; position: absolute; left: 2px; color: var(--amber); font-weight: 800; }
+
+  /* ===== 话术 ===== */
+  .pitch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 760px) { .pitch-grid { grid-template-columns: 1fr; } }
+  .pitch-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .pitch-card .who { font-size: 12px; font-weight: 700; color: #fff; background: var(--brand); display: inline-block; border-radius: 6px; padding: 1px 10px; margin-bottom: 10px; }
+  .pitch-card p { font-size: 13px; color: var(--ink-2); font-style: italic; }
+
+  .demo { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px 26px; margin-top: 14px; }
+  .demo h3 { font-size: 15px; margin-bottom: 12px; color: var(--brand); }
+  .demo ol { margin-left: 20px; }
+  .demo li { font-size: 13.5px; color: var(--ink-2); padding: 4px 0; }
+  .demo code { background: var(--brand-bg); color: var(--brand); border-radius: 5px; padding: 1px 7px; font-size: 12.5px; font-family: Consolas, monospace; }
+
+  .footer { text-align: center; color: var(--ink-3); font-size: 12.5px; margin-top: 40px; }
+  .footer a { color: var(--brand-light); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 头部 -->
+  <div class="hero">
+    <span class="tag">PROJECT ANALYSIS · v0.1.0</span>
+    <h1>AutoManual AI 项目分析</h1>
+    <div class="sub">AI 辅助系统操作手册生成工具 —— 多模态截图理解 + 交互式视觉标注 + 结构化步骤编辑 + 一键导出 Word</div>
+    <div class="meta">
+      <span>源码规模 <b>2186 行 / 15 个文件</b></span>
+      <span>质量验证 <b>tsc + build 零错误</b></span>
+      <span>代码仓库 <b>github.com/1510431041/CZSC</b></span>
+      <span>本地运行 <b>npm run dev → :5173</b></span>
+    </div>
+  </div>
+
+  <!-- 电梯陈述 -->
+  <div class="pitch">
+    <h2>三句话版本 · ELEVATOR PITCH</h2>
+    <ol>
+      <li><span class="no">1</span><div><strong>是什么：</strong>本地优先的 Web 工具——把系统截图粘贴进来，AI 视觉模型看懂界面，自动生成结构化操作手册，一键导出政企级 Word（.docx）。</div></li>
+      <li><span class="no">2</span><div><strong>解决什么：</strong>手册编写 80% 是重复劳动（截图、画红框标序号、逐字写说明、整理字段表、调 Word 排版），本工具把其中大部分交给 AI，目标效率提升 70% 以上。</div></li>
+      <li><span class="no">3</span><div><strong>差异点：</strong>AI 不是「看图猜」，而是看你用<strong>红框 / ①②③ 序号标注过</strong>的截图；用<strong>业务术语词典</strong>约束 AI 统一用词；产出直接是带自动编号图注（图 X-Y）的标准交付文档。</div></li>
+    </ol>
+  </div>
+
+  <!-- 1 痛点 -->
+  <section>
+    <div class="sec-title"><span class="idx">01</span><h2>解决什么问题</h2><span class="en">PAIN POINTS</span></div>
+    <table>
+      <tr><th style="width:120px">痛点</th><th>传统做法</th><th>本项目的做法</th></tr>
+      <tr><td>采集截图</td><td class="old">手动截屏、命名、归档</td><td class="new">Ctrl+V / 拖拽直接导入，自动生成步骤卡片</td></tr>
+      <tr><td>视觉标注</td><td class="old">画图工具手工画红框、序号</td><td class="new">Canvas 标注器，坐标归一化存储，缩放不偏移</td></tr>
+      <tr><td>写操作说明</td><td class="old">逐字敲 Word，格式反复调</td><td class="new">视觉大模型按 JSON Schema 生成，结构化编辑</td></tr>
+      <tr><td>字段说明表</td><td class="old">手搓表格，必填项靠记</td><td class="new">AI 从截图自动识别字段、控件类型、是否必填</td></tr>
+      <tr><td>排版导出</td><td class="old">Word 里插图、编号、调样式</td><td class="new">一键导出：多级标题、居中图、自动图注、标准表格</td></tr>
+      <tr><td>术语不一致</td><td class="old">同样功能叫法五花八门</td><td class="new">项目级术语词典（标准词 + 禁用词）约束 AI</td></tr>
+    </table>
+    <p style="font-size:13px;color:var(--ink-2);margin-top:10px">目标用户：政企 / 商业软件的<b>实施顾问、产品文档工程师、技术支持、交付团队</b>。</p>
+  </section>
+
+  <!-- 2 工作流 -->
+  <section>
+    <div class="sec-title"><span class="idx">02</span><h2>核心工作流</h2><span class="en">CORE WORKFLOW</span></div>
+    <div class="flow">
+      <div class="flow-step"><div class="n">1</div><div><h3>建立项目与目录树 <span>MANUAL STRUCTURE</span></h3><p>创建手册项目，维护左侧多级章节目录树（编号 1 / 1.1 / 2.1 自动计算），配置项目专属<span class="hl">业务术语词典</span>。</p></div></div>
+      <div class="flow-step"><div class="n">2</div><div><h3>采集截图与视觉标注 <span>CAPTURE &amp; ANNOTATE</span></h3><p><span class="hl">Ctrl+V / 拖拽 / 上传</span>批量导入系统截图（&gt;1920px 自动等比压缩）；Canvas 标注器添加红框、①②③序号角标、箭头、马赛克脱敏。</p></div></div>
+      <div class="flow-step"><div class="n">3</div><div><h3>AI 多模态解析与生成 <span>VISION LLM</span></h3><p>填写一句意图说明，将<span class="hl">标注后的截图 + 意图 + 术语词典</span>发给视觉大模型，按严格 JSON Schema 返回：功能概述 / 前置条件 / 与截图一一对应的分步说明 / 页面字段控件表 / 注意事项 FAQ。</p></div></div>
+      <div class="flow-step"><div class="n">4</div><div><h3>结构化微调 <span>EDITOR</span></h3><p>卡片式编辑器中<span class="hl">拖拽排序</span>步骤、就地编辑文本与字段表、针对单步调用 AI 局部润色。</p></div></div>
+      <div class="flow-step"><div class="n">5</div><div><h3>标准格式一键导出 <span>EXPORT</span></h3><p>导出 <span class="hl">.docx</span>（多级标题 + 居中图片 + 自动编号图注「图 X-Y」+ 4 列字段表）或 <span class="hl">.zip</span>（Markdown + assets 截图资源包）。</p></div></div>
+    </div>
+    <div class="flow-banner">一句话：截图贴进来，标注点两句，AI 写成章，一键变 Word</div>
+  </section>
+
+  <!-- 3 架构 -->
+  <section>
+    <div class="sec-title"><span class="idx">03</span><h2>技术架构</h2><span class="en">ARCHITECTURE</span></div>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-node"><div class="t">用户操作层</div><div class="d">Ctrl+V 粘贴 · 拖拽<br>卡片编辑 · 标注画板</div></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node done"><div class="t">UI 层</div><div class="d">ChapterWorkspace · StepCard<br>React 18 + Tailwind/Shadcn</div></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node done"><div class="t">工具层</div><div class="d">imageHelper 压缩/Base64<br>chapter 自动编号</div></div>
+      </div>
+      <div class="arch-row" style="margin-top:12px">
+        <div class="arch-node done"><div class="t">状态层</div><div class="d">Zustand 写穿式 CRUD<br>项目/章节/步骤/字段/术语</div></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node done"><div class="t">持久层</div><div class="d">IndexedDB（idb-keyval）<br>独立库 auto-manual-ai</div></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node plan"><div class="t">AI 层（建设中）</div><div class="d">OpenAI 兼容 Vision API<br>gpt-4o / qwen-vl-max / DeepSeek</div></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node plan"><div class="t">导出层（规划）</div><div class="d">docx 生成政企级 Word<br>jszip 打包 Markdown</div></div>
+      </div>
+      <div class="arch-cap"><span class="g">● 绿框 = 已实现</span> &nbsp;·&nbsp; <span class="a">虚线框 = 规范已定义、开发中</span> &nbsp;·&nbsp; 每层严格复用同一份 TypeScript 数据契约（零 any）</div>
+    </div>
+  </section>
+
+  <!-- 4 数据契约 -->
+  <section>
+    <div class="sec-title"><span class="idx">04</span><h2>数据契约 · 三个设计亮点</h2><span class="en">DATA CONTRACT</span></div>
+    <div class="cards">
+      <div class="card">
+        <h3>① 标注坐标归一化</h3>
+        <p>所有标注图形的坐标与尺寸均相对原图宽高存储。截图分辨率再变、窗口再缩放，红框绝不偏移。</p>
+        <code>x: 0.42, y: 0.18,
+width: 0.16, height: 0.05</code>
+      </div>
+      <div class="card">
+        <h3>② 每张图存两份 Base64</h3>
+        <p>同时保存原图与合成标注后的图。发给 AI 的是合成图——AI 真的能看见红框和序号；坐标数组保留，可随时二次微调。</p>
+        <code>rawBase64: 原图
+annotatedBase64: 标注合成图
+annotations: 坐标数组</code>
+      </div>
+      <div class="card">
+        <h3>③ 章节模型 = 文档结构</h3>
+        <p>章节字段排布与最终 Word 文档一一对应，编辑即所见、所见即导出，杜绝「排版两层皮」。</p>
+        <code>overview → prerequisites
+→ steps → fields
+→ precautions</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 进度 -->
+  <section>
+    <div class="sec-title"><span class="idx">05</span><h2>当前进度与路线图</h2><span class="en">PROGRESS</span></div>
+    <div class="progress">
+      <div class="prow"><span class="name">阶段一 · 脚手架 + 数据层</span><div class="bar"><div class="fill f100" style="width:100%"></div></div><span class="pct f100">100% ✅</span></div>
+      <div class="prow"><span class="name">阶段二 · 工作台 + 标注器</span><div class="bar"><div class="fill f40" style="width:40%"></div></div><span class="pct f40">40% 🔶</span></div>
+      <div class="prow"><span class="name">阶段三 · AI 引擎 + 术语库</span><div class="bar"><div class="fill f10" style="width:10%"></div></div><span class="pct f10">10% 🔶</span></div>
+      <div class="prow"><span class="name">阶段四 · Word / Markdown 导出</span><div class="bar"><div class="fill f0" style="width:0%"></div></div><span class="pct f0">0% ⬜</span></div>
+    </div>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-top:14px">
+      <b>当前已可用：</b>章节树切换与自动编号 · 全局 Ctrl+V / 拖拽 / 上传导入截图 · 步骤卡片就地编辑（标题 / 说明 / 图注）· 字段说明表展示 · 数据写穿 IndexedDB 刷新不丢 · 内置示例项目（3 张带红框序号的模拟截图，4 章节 / 7 步骤 / 7 字段 / 3 术语）开箱即用。
+    </p>
+  </section>
+
+  <!-- 6 优缺点 -->
+  <section>
+    <div class="sec-title"><span class="idx">06</span><h2>亮点与已知边界</h2><span class="en">STRENGTHS &amp; LIMITS</span></div>
+    <div class="two-col">
+      <div class="box good">
+        <h3>✓ 技术亮点</h3>
+        <ul>
+          <li>数据契约先行：8 个核心接口一次定义，全层复用，零 any</li>
+          <li>写穿持久化 + 章节自动重编号，删中间章节后续编号自动补位</li>
+          <li>大图自动压缩（&gt;1920px 等比降采样，PNG 无损保文字清晰）</li>
+          <li>AI 配置与业务数据隔离存储，Key 不随项目数据走</li>
+          <li>示例数据 Canvas 程序化生成，克隆即可跑，无需准备素材</li>
+        </ul>
+      </div>
+      <div class="box risk">
+        <h3>! 已知边界（主动说明反而加分）</h3>
+        <ul>
+          <li>纯本地存储：换浏览器 / 清站点数据会丢，后续加备份导入导出</li>
+          <li>AI Key 用户自理：工具不托管密钥，支持任意 OpenAI 兼容端点</li>
+          <li>单项目结构，多项目切换是后续增强</li>
+          <li>标注器 / AI 生成 / 导出引擎仍在建设中（阶段二~四）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 怎么讲 -->
+  <section>
+    <div class="sec-title"><span class="idx">07</span><h2>怎么讲给别人</h2><span class="en">HOW TO PRESENT</span></div>
+    <div class="pitch-grid">
+      <div class="pitch-card"><span class="who">30 秒 · 领导 / 业务方</span><p>「以前写一套系统操作手册要反复截图、画框、逐字敲 Word。这个工具把截图粘进来，AI 直接看懂界面生成规范文档，一键导出带自动编号图注的 Word。目标效率提升 70%，演示版已能跑，AI 生成和导出正在接。」</p></div>
+      <div class="pitch-card"><span class="who">3 分钟 · 技术同事</span><p>「本地优先单页应用，React + TS strict + Zustand + IndexedDB。截图走 Canvas 标注器，归一化坐标存储，发给视觉大模型的是合成图，所以 AI 能看见红框。写穿持久化，契约先定死。当前阶段一闭环，截图导入已可用，剩标注器、AI 引擎、导出引擎三块。」</p></div>
+      <div class="pitch-card"><span class="who">15 分钟 · 完整演示</span><p>打开页面即见证示例项目自动加载 → 点读章节树与字段表 → 当场 Ctrl+V 粘一张真实截图 → 改标题写说明 → 刷新页面证明数据不丢 → 展示路线图收尾。</p></div>
+    </div>
+    <div class="demo">
+      <h3>常见提问预答</h3>
+      <ol>
+        <li><b>和直接手写 Word 比强在哪？</b>——截图导入、结构化编辑、编号/图注/表格全自动，AI 承担初稿。</li>
+        <li><b>和 Confluence / 语雀比？</b>——那些是通用文档平台；本工具是「手册生产线」：从截图到成品文档的垂直工作流。</li>
+        <li><b>数据安全？</b>——本地优先，数据不出浏览器；只有点击 AI 生成时，所选截图才发给你自己配置的模型端点。</li>
+        <li><b>AI 写错了怎么办？</b>——AI 只出初稿，所有内容结构化可编辑；术语词典 + temperature=0.2 约束严谨性。</li>
+        <li><b>能团队协作吗？</b>——当前单机版，数据模型已按可协作方向设计，后续接云端。</li>
+      </ol>
+      <p style="font-size:13px;color:var(--ink-2);margin-top:12px">演示启动命令：<code>npm run dev</code> → 浏览器打开 <code>http://localhost:5173</code></p>
+    </div>
+  </section>
+
+  <div class="footer">
+    本文档由项目源码与《AI_MANUAL_GENERATOR_SPEC.md》规范整理生成 · 仓库 <a href="https://github.com/1510431041/CZSC">github.com/1510431041/CZSC</a> · 2026-10-20
+  </div>
+
+</div>
+</body>
+</html>

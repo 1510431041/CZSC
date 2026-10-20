@@ -115,6 +115,7 @@ src/
 ## 相关文档
 
 - [`PROJECT_ANALYSIS.md`](PROJECT_ANALYSIS.md) —— 项目分析（架构、亮点、演示话术、常见提问预答）
+- [`analysis.html`](analysis.html) —— 可视化项目分析页（浏览器直接打开）
 - [`AI_MANUAL_GENERATOR_SPEC.md`](AI_MANUAL_GENERATOR_SPEC.md) —— 完整产品需求与技术规范
 
 ## 已知边界
